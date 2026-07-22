@@ -10,7 +10,7 @@
 
 ```bash
 cd backend
-uv sync
+uv sync --extra dev
 # lint と型
 uv run ruff check .
 uv run mypy app
@@ -27,9 +27,11 @@ uv run uvicorn app.main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
+Copy-Item .env.local.example .env.local   # 必要に応じ NEXT_PUBLIC_API_BASE_URL を編集
 npm run lint
 npm run typecheck
 npm test
+npm run build
 npm run dev   # http://localhost:3000
 ```
 
@@ -47,6 +49,8 @@ npm run dev   # http://localhost:3000
 docker run --rm -v "$PWD:/workspace" anchore/grype:latest dir:/workspace
 # SBOM
 docker run --rm -v "$PWD:/workspace" anchore/syft:latest dir:/workspace -o spdx-json > sbom.spdx.json
+# フロントエンド依存監査（Node標準）
+cd frontend; npm audit --audit-level=moderate
 ```
 
 ## PBT再現性 (PBT-08)
@@ -55,7 +59,35 @@ docker run --rm -v "$PWD:/workspace" anchore/syft:latest dir:/workspace -o spdx-
 - 失敗時はseedと最小反例が出力される。
 - seed固定は `HYPOTHESIS_SEED` もしくは `--hypothesis-seed` で可能。
 
+## ビルド・テスト実行結果
+
+### バックエンド（`backend/`）
+
+- ruff check: 成功（0件）
+- mypy app（strict）: 成功（15ファイル・0件）
+- pytest: 28件すべて成功
+  - test_api.py 9件 / test_description_service.py 8件 / test_image_validation.py 9件 / test_schemas_pbt.py 2件
+
+### フロントエンド（`frontend/`）
+
+- eslint: 成功（0件）
+- tsc --noEmit: 成功（0件）
+- vitest run: 12件すべて成功（4ファイル）
+  - validation / apiClient / DescriptionResult / ImageUploader
+- next build: 本番ビルド成功（静的プリレンダリング）
+- npm audit: 脆弱性0件（PostCSSを8.5.10へoverride）
+
+## セキュリティヘッダー検証（稼働確認）
+
+`GET http://localhost:3000` の応答で以下を確認済み:
+
+- `Content-Security-Policy`: `default-src 'self'` 起点の制限的ポリシー
+- `Strict-Transport-Security`: `max-age=31536000; includeSubDomains`
+- `X-Content-Type-Options`: `nosniff`
+- `X-Frame-Options`: `DENY`
+- `Referrer-Policy`: `strict-origin-when-cross-origin`
+
 ## ビルド・テストサマリー
 
-- 品質ゲート: ruff, mypy, pytest（BE）／ eslint, tsc, vitest（FE）。
-- 生成コード後に各ゲートを実行し結果を記録する。
+- 品質ゲート: ruff, mypy, pytest（BE）／ eslint, tsc, vitest, next build, npm audit（FE）。
+- すべての品質ゲートが成功。Operationsフェーズ（ローカル運用手順）へ進行可能。

@@ -32,13 +32,13 @@ image_description/
 │   ├── app/          # アプリケーション本体（API・設定・検証・AIサービス・スキーマ）
 │   ├── tests/        # pytest による単体・API・Property-Based テスト
 │   └── README.md     # バックエンドのセットアップと実行方法
-├── frontend/         # Next.js フロントエンド（計画中）
+├── frontend/         # Next.js フロントエンド（実装済み）
 ├── aidlc-docs/       # AI-DLC 方法論による設計・要件ドキュメント
 └── AGENTS.md         # AI コーディングエージェント向けの指針
 ```
 
-> **注記**: 現時点では `backend/` が実装済みです。`frontend/`（Next.js）は
-> [要件定義書](aidlc-docs/inception/requirements/requirements.md) に基づき今後実装予定です。
+> **注記**: `backend/`（FastAPI）と `frontend/`（Next.js）はいずれも実装済みで、
+> 各品質ゲート（lint・型検査・テスト・ビルド）が通過しています。
 
 ## クイックスタート（バックエンド）
 
@@ -53,6 +53,29 @@ uv run uvicorn app.main:app --reload --port 8000
 - ヘルスチェック: http://localhost:8000/health
 
 詳細なセットアップ・環境変数・API 仕様は [backend/README.md](backend/README.md) を参照してください。
+
+## クイックスタート（フロントエンド）
+
+```bash
+cd frontend
+npm install
+Copy-Item .env.local.example .env.local   # 必要に応じ NEXT_PUBLIC_API_BASE_URL を編集
+npm run dev
+```
+
+- 画面: http://localhost:3000（バックエンドは既定で http://localhost:8000 を使用）
+
+品質チェック（フロントエンド）:
+
+```bash
+cd frontend
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+詳細は [frontend/README.md](frontend/README.md) を参照してください。
 
 ## API 概要
 
@@ -93,3 +116,5 @@ uv run pytest
 
 ユーザー登録・ログイン、データベースや履歴保存、複数画像の一括処理、画像 URL 入力、
 画像編集・生成、OCR 精度保証、人物識別、クラウド配備用 IaC、本番 SLA 保証などは対象外です。
+
+

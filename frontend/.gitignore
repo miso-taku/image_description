@@ -1,0 +1,23 @@
+# Next.js
+/.next/
+/out/
+/build/
+next-env.d.ts
+
+# Dependencies
+/node_modules/
+
+# Testing / coverage
+/coverage/
+
+# Environment
+.env
+.env.*
+!.env.local.example
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db

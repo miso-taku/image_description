@@ -6,9 +6,10 @@ import time
 import uuid
 from collections import defaultdict, deque
 
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
+from starlette.types import ASGIApp
 
 from app.core.errors import LocalRateLimitedError
 
@@ -20,7 +21,11 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     (SECURITY-03 correlation, avoids client-controlled log injection).
     """
 
-    async def dispatch(self, request: Request, call_next) -> Response:  # type: ignore[override]
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
         request_id = str(uuid.uuid4())
         request.state.request_id = request_id
         response = await call_next(request)
@@ -35,7 +40,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     not a substitute for a distributed rate limiter in production.
     """
 
-    def __init__(self, app, *, max_requests: int, window_seconds: int) -> None:
+    def __init__(
+        self,
+        app: ASGIApp,
+        *,
+        max_requests: int,
+        window_seconds: int,
+    ) -> None:
         super().__init__(app)
         self._max_requests = max_requests
         self._window_seconds = window_seconds
@@ -44,7 +55,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def _client_key(self, request: Request) -> str:
         return request.client.host if request.client else "unknown"
 
-    async def dispatch(self, request: Request, call_next) -> Response:  # type: ignore[override]
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
         if request.url.path.startswith("/api/"):
             key = self._client_key(request)
             now = time.monotonic()

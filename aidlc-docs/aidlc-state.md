@@ -5,15 +5,15 @@
 - **Project Name**: Image Description
 - **Project Type**: Greenfield
 - **Start Date**: 2026-07-20T14:42:06.1320955+09:00
-- **Current Phase**: INCEPTION
-- **Current Stage**: Requirements Analysis - Awaiting Approval
+- **Current Phase**: CONSTRUCTION
+- **Current Stage**: Build and Test - Complete (Operations pending)
 
 ## Workspace State
 
-- **Existing Code**: No
-- **Programming Languages**: None detected
-- **Build System**: None detected
-- **Project Structure**: Empty greenfield workspace
+- **Existing Code**: Yes (backend + frontend implemented)
+- **Programming Languages**: Python 3.12.8, TypeScript
+- **Build System**: uv (backend), npm / Next.js (frontend)
+- **Project Structure**: `backend/` (FastAPI+PydanticAI), `frontend/` (Next.js), `aidlc-docs/`
 - **Reverse Engineering Needed**: No
 - **Workspace Root**: `C:\Users\wkta9\image_description`
 
@@ -44,29 +44,36 @@
 
 - [x] Workspace Detection
 - [x] Reverse Engineering - skipped because this is a greenfield project
-- [ ] Requirements Analysis - artifacts complete, awaiting explicit approval
-- [ ] User Stories - recommended because this is a new user-facing workflow
-- [ ] Workflow Planning
-- [ ] Application Design - pending workflow approval
-- [ ] Units Generation - pending workflow approval
+- [x] Requirements Analysis
+- [x] User Stories
+- [x] Workflow Planning
+- [x] Application Design
+- [x] Units Generation - skipped (single cohesive unit)
 
 ### CONSTRUCTION PHASE
 
-- [ ] Functional Design
-- [ ] NFR Requirements
-- [ ] NFR Design
-- [ ] Infrastructure Design
-- [ ] Code Generation
-- [ ] Build and Test
+- [x] Functional Design
+- [x] NFR Requirements
+- [x] NFR Design
+- [x] Infrastructure Design - skipped (cloud deployment out of scope)
+- [x] Code Generation (backend + frontend)
+- [x] Build and Test
 
 ### OPERATIONS PHASE
 
-- [ ] Operations - placeholder
+- [ ] Operations - pending (local run guidance)
 
 ## Current Status
 
-- **Lifecycle Phase**: INCEPTION
-- **Current Stage**: Requirements Analysis
-- **Next Stage**: User Stories
-- **Status**: Requirements review required
+- **Lifecycle Phase**: CONSTRUCTION
+- **Current Stage**: Build and Test
+- **Next Stage**: Operations
+- **Status**: All quality gates passing (backend ruff/mypy/pytest, frontend eslint/tsc/vitest/build/audit); awaiting review to proceed to Operations
 
+## Notes on Resume Consistency
+
+- This session detected that `aidlc-state.md` had been left at "Requirements Analysis - Awaiting Approval"
+  while later artifacts (user stories, design, code-generation plan, backend implementation) already existed.
+- No prior approved artifacts were regenerated or overwritten. Work resumed at the true point of interruption:
+  Code Generation (frontend implementation) followed by Build and Test.
+- Backend had 7 strict-mypy findings in `app/core/security.py`; these were fixed (typed middleware signatures).
